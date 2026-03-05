@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.T.A.R</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #fef6e4 0%, #f3e5d8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* LOGIN SCREEN */
+        .login-screen {
+            width: 100%;
+            max-width: 450px;
+            background: linear-gradient(135deg, #e8d5f2 0%, #d4c5e8 100%);
+            border-radius: 40px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(138, 99, 210, 0.2);
+            text-align: center;
+        }
+        .login-screen.hidden { display: none; }
+        .login-title {
+            font-family: 'Righteous', cursive;
+            font-size: 72px;
+            color: #ff6b4a;
+            letter-spacing: 10px;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 0px rgba(255, 107, 74, 0.2);
+        }
+        .login-subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .login-input {
+            padding: 18px 24px;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s;
+        }
+        .login-input:focus {
+            outline: none;
+            border-color: #ff6b4a;
+            box-shadow: 0 0 0 5px rgba(255, 107, 74, 0.1);
+        }
+        .login-btn {
+            padding: 18px;
+            background: linear-gradient(135deg, #ff6b4a 0%, #ff5735 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 74, 0.3);
+        }
+        .login-error {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: none;
+            margin-top: 10px;
+        }
+        .login-error.show { display: block; }
+
+        /* MAIN APP (same as before) */
+        .app { width: 100%; max-width: 480px; display: none; }
+        .app.show { display: block; }
+        .main-card {
+            background: linear-gradient(135deg, #e8d5f2 0%, #d4c5e8 100%);
+            border-radius: 60px;
+            padding: 50px 35px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 35px;
+            box-shadow: 0 20px 60px rgba(138, 99, 210, 0.15);
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .settings-icon {
+            position: absolute;
+            top: 22px;
+            right: 22px;
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 22px;
+            transition: all 0.4s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .settings-icon:hover { transform: rotate(180deg) scale(1.1); background: #ff6b4a; }
+        .user-badge {
+            position: absolute;
+            top: 22px;
+            left: 22px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .title {
+            font-family: 'Righteous', cursive;
+            font-size: 88px;
+            color: #ff6b4a;
+            letter-spacing: 12px;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px rgba(255, 107, 74, 0.2);
+        }
+        /* ============ SMOOTH PROFESSIONAL ANIMATIONS ============ */
+        .star-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            cursor: pointer;
+            transition: transform 0.3s ease-out;
+            filter: drop-shadow(0 8px 20px rgba(255, 215, 0, 0.4));
+        }
+        .star-container:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 12px 30px rgba(255, 215, 0, 0.6));
+        }
+
+        /* IDLE - Gentle breathing animation */
+        .star-container.idle {
+            animation: gentleBreath 4s ease-in-out infinite;
+        }
+        @keyframes gentleBreath {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.03) rotate(2deg);
+            }
+        }
+
+        /* HAPPY - Smooth floating bob */
+        .star-container.happy {
+            animation: happyFloat 3s ease-in-out infinite;
+        }
+        @keyframes happyFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            25% {
+                transform: translateY(-6px) scale(1.02);
+            }
+            75% {
+                transform: translateY(-3px) scale(1.01);
+            }
+        }
+        
+        /* EXCITED - Smooth spin */
+        .star-container.excited {
+            animation: excitedSpin 1.5s linear infinite;
+        }
+        @keyframes excitedSpin {
+            0% {
+                transform: rotate(0deg) scale(1.05);
+            }
+            100% {
+                transform: rotate(360deg) scale(1.05);
+            }
+        }
+        
+        /* SAD - Slow deflated sink with dim */
+        .star-container.sad {
+            animation: sadSink 3.5s ease-in-out infinite;
+            filter: drop-shadow(0 5px 15px rgba(120, 120, 180, 0.3));
+        }
+        @keyframes sadSink {
+            0%, 100% { transform: translateY(0) scale(0.93); opacity: 0.88; }
+            50% { transform: translateY(7px) scale(0.91); opacity: 0.85; }
+        }
+        
+        /* THINKING - Gentle contemplative tilt */
+        .star-container.thinking {
+            animation: thinkingTilt 3s ease-in-out infinite;
+        }
+        @keyframes thinkingTilt {
+            0%, 100% { transform: rotate(-3deg) scale(0.98); }
+            50% { transform: rotate(3deg) scale(1.01); }
+        }
+        
+        /* LISTENING - Smooth pulse with glow */
+        .star-container.listening {
+            animation: listeningPulse 2s ease-in-out infinite;
+        }
+        @keyframes listeningPulse {
+            0%, 100% {
+                transform: scale(1) rotate(-2deg);
+                filter: drop-shadow(0 8px 20px rgba(16, 185, 129, 0.6));
+            }
+            50% {
+                transform: scale(1.1) rotate(2deg);
+                filter: drop-shadow(0 12px 35px rgba(16, 185, 129, 0.9));
+            }
+        }
+
+        /* TALKING - Rhythmic bounce */
+        .star-container.talking {
+            animation: talkingRhythm 0.7s ease-in-out infinite;
+        }
+        @keyframes talkingRhythm {
+            0%, 100% {
+                transform: scale(1) translateY(0);
+            }
+            30% {
+                transform: scale(1.05) translateY(-4px);
+            }
+            60% {
+                transform: scale(1.02) translateY(-2px);
+            }
+        }
+
+        /* LOVE - Gentle heartbeat pulse */
+        .star-container.love {
+            animation: lovePulse 1.2s ease-in-out infinite;
+        }
+        @keyframes lovePulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 8px 25px rgba(255, 105, 180, 0.6));
+            }
+            50% {
+                transform: scale(1.08);
+                filter: drop-shadow(0 12px 35px rgba(255, 105, 180, 0.9));
+            }
+        }
+        
+        /* STRESSED - Nervous shake */
+        .star-container.stressed {
+            animation: stressedShake 0.3s ease-in-out infinite;
+        }
+        @keyframes stressedShake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-4px) rotate(-2deg); }
+            75% { transform: translateX(4px) rotate(2deg); }
+        }
+        
+        /* Natural smooth blinking */
+        .star-container.blinking .eyes {
+            animation: smoothBlink 0.2s ease-in-out;
+        }
+        @keyframes smoothBlink {
+            0%, 100% {
+                transform: scaleY(1);
+            }
+            50% {
+                transform: scaleY(0.1);
+            }
+        }
+        
+        /* Enhanced particle effects with sparkles */
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 1) 0%, rgba(255, 165, 0, 0.8) 50%, rgba(255, 215, 0, 0) 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 2s ease-out forwards;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(calc(var(--tx) * 0.5), -40px) scale(1.2) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), -80px) scale(0.2) rotate(360deg);
+            }
+        }
+
+        /* Removed continuous sparkles for cleaner look */
+        .star-body { fill: url(#starGradient); stroke: #fff; stroke-width: 3; }
+        .eyes { fill: #2d2d2d; transition: transform 0.15s ease-out; }
+        .mouth { stroke: #2d2d2d; stroke-width: 3; stroke-linecap: round; fill: none; transition: all 0.3s; }
+        .chat-bubble {
+            background: white;
+            border-radius: 28px;
+            padding: 22px;
+            min-height: 220px;
+            max-height: 380px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+        }
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .msg {
+            padding: 14px 18px;
+            border-radius: 18px;
+            max-width: 88%;
+            line-height: 1.6;
+            font-size: 14.5px;
+            animation: msgSlideIn 0.4s ease-out;
+        }
+        @keyframes msgSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .msg.user { background: linear-gradient(135deg, #ffe5dd 0%, #ffd4c4 100%); color: #2d2d2d; align-self: flex-end; border-bottom-right-radius: 6px; }
+        .msg.star { background: linear-gradient(135deg, #f3e8ff 0%, #e8d5ff 100%); color: #2d2d2d; align-self: flex-start; border-bottom-left-radius: 6px; }
+        .typing { display: none; padding: 14px 18px; background: linear-gradient(135deg, #f3e8ff 0%, #e8d5ff 100%); border-radius: 18px; width: 70px; align-self: flex-start; }
+        .typing.show { display: flex; gap: 6px; justify-content: center; }
+        .typing span { width: 8px; height: 8px; background: #9333ea; border-radius: 50%; animation: typingDot 1.4s infinite; }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingDot { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+        .messages::-webkit-scrollbar { width: 6px; }
+        .messages::-webkit-scrollbar-thumb { background: #d4c5e8; border-radius: 10px; }
+        .input-bar {
+            background: white;
+            border: 5px solid #ff6b4a;
+            border-radius: 70px;
+            padding: 8px 12px 8px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 25px rgba(255, 107, 74, 0.25);
+        }
+        #textInput {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 28px;
+            color: #ff6b4a;
+            font-weight: 700;
+            background: transparent;
+            font-family: 'Righteous', cursive;
+        }
+        #textInput::placeholder { color: #ff6b4a; opacity: 0.6; }
+        .send-btn {
+            background: linear-gradient(135deg, #ff6b4a 0%, #ff5735 100%);
+            border: none;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .send-btn:hover { background: linear-gradient(135deg, #ff5735 0%, #ff4520 100%); transform: scale(1.12); }
+        .send-btn svg { width: 28px; height: 28px; }
+        .recording-badge {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 30px;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+        }
+        .recording-badge.show { display: flex; }
+        .recording-badge::before { content: ''; width: 12px; height: 12px; background: white; border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-box { background: white; border-radius: 35px; width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; padding: 35px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25); }
+        .modal-title { font-size: 32px; font-weight: 700; color: #ff6b4a; margin-bottom: 25px; font-family: 'Righteous', cursive; }
+        .close-modal { float: right; font-size: 36px; cursor: pointer; color: #999; transition: all 0.3s; }
+        .close-modal:hover { color: #ff6b4a; transform: rotate(90deg); }
+        .input-field { width: 100%; padding: 14px 18px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 15px; margin-bottom: 16px; transition: all 0.3s; }
+        .input-field:focus { outline: none; border-color: #ff6b4a; box-shadow: 0 0 0 4px rgba(255, 107, 74, 0.1); }
+        .textarea-field { min-height: 120px; resize: vertical; font-family: 'DM Sans', sans-serif; }
+        .btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #e8d5f2 0%, #d4c5e8 100%); color: #ff6b4a; border: none; border-radius: 16px; font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.3s; }
+        .btn:hover { transform: translateY(-3px); }
+        .btn-primary { background: linear-gradient(135deg, #ff6b4a 0%, #ff5735 100%); color: white; }
+        .feature-item { background: #f9fafb; padding: 18px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .delete-btn { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600; }
+        .logout-btn {
+            position: absolute;
+            bottom: 22px;
+            right: 22px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover { background: #dc2626; transform: scale(1.05); }
+        .mute-btn {
+            position: absolute;
+            bottom: 22px;
+            left: 22px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #666;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .mute-btn:hover { transform: scale(1.05); background: #ff6b4a; }
+        .mute-btn.muted { background: #ef4444; color: white; }
+        .watermark {
+            position: fixed;
+            bottom: 8px;
+            right: 12px;
+            font-size: 10px;
+            color: rgba(0, 0, 0, 0.25);
+            font-weight: 500;
+            z-index: 9999;
+            user-select: none;
+            pointer-events: none;
+        }
+
+
+        /* PRIVATE JOURNAL BUTTON */
+        .journal-btn {
+            position: absolute;
+            top: 22px;
+            left: 180px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .journal-btn:hover { transform: scale(1.1); background: #ffd4c4; }
+
+        /* Journal Entry Styles with Pink Bow Background */
+        .journal-entry {
+            background:
+                linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.85) 0%,
+                    rgba(255, 249, 230, 0.85) 100%
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 22px,
+                    rgba(200, 150, 160, 0.3) 22px,
+                    rgba(200, 150, 160, 0.3) 23px
+                );
+            padding: 18px;
+            border-radius: 18px;
+            margin-bottom: 15px;
+            position: relative;
+            border-left: 4px solid #d4a5b5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+        .journal-entry:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); }
+        .journal-entry.pinned {
+            border-left-color: #d4a5b5;
+            background:
+                linear-gradient(to bottom,
+                    rgba(255, 250, 240, 0.9) 0%,
+                    rgba(255, 245, 220, 0.9) 100%
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 22px,
+                    rgba(212, 165, 181, 0.4) 22px,
+                    rgba(212, 165, 181, 0.4) 23px
+                );
+        }
+        .journal-entry.pinned::before {
+            content: '🎀';
+            position: absolute;
+            top: -8px;
+            right: 15px;
+            font-size: 30px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        .journal-title {
+            font-weight: 700;
+            color: #d4a5b5;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .journal-entry.pinned .journal-title::before {
+            content: '📌 ';
+        }
+        .journal-content {
+            color: #333;
+            line-height: 1.8;
+            font-size: 14px;
+            white-space: pre-wrap;
+            font-family: 'Georgia', serif;
+        }
+        .journal-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            font-size: 11px;
+            color: #999;
+        }
+        .journal-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .journal-action-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 4px;
+        }
+        .journal-action-btn:hover { transform: scale(1.2); }
+
+        /* REACTION BUTTONS */
+        .reaction-panel {
+            display: none;
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px;
+            border-radius: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            gap: 8px;
+        }
+        .reaction-panel.show { display: flex; }
+        .reaction-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 5px;
+        }
+        .reaction-btn:hover { transform: scale(1.3); }
+
+        /* MOOD COLORS - Dynamic star gradient colors */
+        .star-body {
+            fill: url(#starGradient);
+            stroke: #fff;
+            stroke-width: 3;
+            transition: fill 0.8s ease;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Watermark -->
+    <div class="watermark">by modi</div>
+
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-title">S.T.A.R</div>
+        <div class="login-subtitle">Your Personal AI Companion</div>
+        <form class="login-form" onsubmit="handleLogin(event)">
+            <input type="text" id="username" class="login-input" placeholder="Username" autocomplete="username" required />
+            <input type="password" id="password" class="login-input" placeholder="Password" autocomplete="current-password" required />
+            <button type="submit" class="login-btn">Login</button>
+            <div class="login-error" id="loginError">Invalid username or password</div>
+        </form>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="recording-badge" id="recordingBadge">🎤 Listening...</div>
+
+    <div class="app" id="mainApp">
+        <div class="main-card">
+            <div class="user-badge" id="userBadge">👤 User</div>
+            <button class="journal-btn" onclick="openJournal()">📔</button>
+            <div class="settings-icon" id="settingsIcon" onclick="attemptSettings()">⚙️</div>
+            <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            <div class="title">S.T.A.R</div>
+
+            <div class="star-container happy" id="starContainer" onclick="startVoice()" oncontextmenu="showReactions(event); return false;">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="starGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fff9e6" id="gradStop1"/>
+                            <stop offset="30%" style="stop-color:#ffeb3b" id="gradStop2"/>
+                            <stop offset="70%" style="stop-color:#ffd700" id="gradStop3"/>
+                            <stop offset="100%" style="stop-color:#ffb300" id="gradStop4"/>
+                        </linearGradient>
+                        <filter id="softGlow">
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Cute 5-pointed star body -->
+                    <path class="star-body"
+                          d="M 100,20
+                             L 115,75
+                             L 175,80
+                             L 130,120
+                             L 145,175
+                             L 100,145
+                             L 55,175
+                             L 70,120
+                             L 25,80
+                             L 85,75 Z"
+                          filter="url(#softGlow)"/>
+
+                    <!-- Highlight shine -->
+                    <ellipse cx="85" cy="60" rx="20" ry="25" fill="white" opacity="0.3"/>
+
+                    <!-- Simple round eyes -->
+                    <circle class="eyes" id="leftEye" cx="85" cy="95" r="8"/>
+                    <circle class="eyes" id="rightEye" cx="115" cy="95" r="8"/>
+
+                    <!-- Eye shine -->
+                    <circle cx="87" cy="93" r="3" fill="white" opacity="0.8"/>
+                    <circle cx="117" cy="93" r="3" fill="white" opacity="0.8"/>
+
+                    <!-- Cute smile -->
+                    <path class="mouth" id="mouth" d="M 85,115 Q 100,125 115,115"/>
+                </svg>
+
+                <!-- Reaction Panel -->
+                <div class="reaction-panel" id="reactionPanel">
+                    <button class="reaction-btn" onclick="triggerReaction('laugh')">😂</button>
+                    <button class="reaction-btn" onclick="triggerReaction('love')">❤️</button>
+                    <button class="reaction-btn" onclick="triggerReaction('cry')">😢</button>
+                    <button class="reaction-btn" onclick="triggerReaction('dance')">💃</button>
+                </div>
+            </div>
+
+            <div class="chat-bubble">
+                <div class="messages" id="messages"></div>
+                <div class="typing" id="typing"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+
+        <div class="input-bar">
+            <input type="text" id="textInput" placeholder="speech" autocomplete="off" spellcheck="false" />
+            <button class="send-btn" id="sendBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.8">
+                    <circle cx="11" cy="11" r="7"/>
+                    <line x1="16" y1="16" x2="20" y2="20"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Password Modal (Admin Only) -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-box">
+            <div class="modal-title">🔒 Admin Access Required</div>
+            <p style="margin-bottom: 20px; color: #666;">Only admins can access settings:</p>
+            <input type="password" id="adminPassword" class="input-field" placeholder="Admin password..." />
+            <button class="btn btn-primary" onclick="checkAdminPassword()">🔓 Unlock</button>
+            <button class="btn" onclick="closePasswordModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Private Journal Modal -->
+    <div class="modal" id="journalModal">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeJournal()">×</span>
+            <div class="modal-title">📔 My Private Journal</div>
+
+            <h3 style="margin-bottom: 12px;">✍️ Write a New Entry</h3>
+            <input type="text" id="journalTitleInput" class="input-field" placeholder="Title (optional)..." />
+            <textarea id="journalContentInput" class="input-field textarea-field" placeholder="Write your thoughts here..." style="min-height: 120px;"></textarea>
+            <button class="btn btn-primary" onclick="saveJournalEntry()">💾 Save Entry</button>
+
+            <hr style="border: none; border-top: 2px solid #f0f0f0; margin: 25px 0;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0;">📚 My Entries</h3>
+                <div style="font-size: 12px; color: #999;">
+                    <label style="cursor: pointer;">
+                        <input type="checkbox" id="showPinnedOnly" onchange="loadJournalEntries()" style="margin-right: 5px;">
+                        📌 Pinned only
+                    </label>
+                </div>
+            </div>
+            <div id="journalEntries" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal (Admin + Sunflower API) -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeSettings()">×</span>
+            <div class="modal-title">⚙️ Settings</div>
+
+            <h3 style="margin-bottom: 12px;">🔐 Change Password</h3>
+            <input type="password" id="currentPassword" class="input-field" placeholder="Current password..." />
+            <input type="password" id="newPassword" class="input-field" placeholder="New password..." />
+            <input type="password" id="confirmPassword" class="input-field" placeholder="Confirm new password..." />
+            <button class="btn btn-primary" onclick="changePassword()">🔑 Change Password</button>
+
+            <hr style="border: none; border-top: 2px solid #f0f0f0; margin: 30px 0;">
+
+            <h3 style="margin-bottom: 12px;">🤖 AI Configuration</h3>
+            <input type="password" id="apiToken" class="input-field" placeholder="Cohere API key..." />
+            <button class="btn btn-primary" onclick="saveAPI()">💾 Save API Token</button>
+
+            <div id="adminOnlySettings">
+                <hr style="border: none; border-top: 2px solid #f0f0f0; margin: 30px 0;">
+
+                <h3 style="margin-bottom: 12px;">💝 Personality</h3>
+                <textarea id="personalityInput" class="input-field textarea-field" placeholder="Define how S.T.A.R should talk..."></textarea>
+                <button class="btn btn-primary" onclick="savePersonality()">💾 Save Personality</button>
+
+                <hr style="border: none; border-top: 2px solid #f0f0f0; margin: 30px 0;">
+
+                <h3 style="margin-bottom: 12px;">🎙️ Your Voice</h3>
+                <input type="text" id="voiceTitle" class="input-field" placeholder="Message title..." />
+                <select id="voiceMood" class="input-field">
+                    <option value="sad">When sad 😢</option>
+                    <option value="stressed">When stressed 😰</option>
+                    <option value="general">Anytime 💝</option>
+                </select>
+                <input type="file" id="voiceFile" accept="audio/*" class="input-field" style="padding: 10px;" />
+                <button class="btn btn-primary" onclick="uploadVoice()">🎤 Upload</button>
+                <div id="voiceList" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== USER ACCOUNTS ==========
+        // Load users from localStorage or use defaults
+        let USERS = JSON.parse(localStorage.getItem('star_users')) || {
+            // ADMIN (YOU - Full access to everything)
+            'wellwisher': {
+                password: 'YouAreTheSunflower',
+                displayName: '🌟 Wellwisher',
+                isAdmin: true
+            },
+            // HER (Regular user - Can set API key and change password)
+            'sunflower': {
+                password: 'alwayshere',
+                displayName: '🌻 Sunflower',
+                isAdmin: false
+            }
+        };
+
+        const ADMIN_PASSWORD = "YouAreTheSunflowerMyLove";  // Settings password for admin
+
+        // ========== LOGIN SYSTEM ==========
+        let currentUser = JSON.parse(localStorage.getItem('star_current_user'));
+
+        // Load API token based on logged-in user
+        function loadUserApiToken() {
+            if (currentUser) {
+                if (currentUser.isAdmin) {
+                    apiToken = localStorage.getItem('star_api') || '';
+                } else {
+                    apiToken = localStorage.getItem('star_api_' + currentUser.username) || '';
+                }
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (USERS[username] && USERS[username].password === password) {
+                // Save user to localStorage (stays logged in)
+                const user = {
+                    username: username,
+                    displayName: USERS[username].displayName,
+                    isAdmin: USERS[username].isAdmin,
+                    loginTime: Date.now()
+                };
+                localStorage.setItem('star_current_user', JSON.stringify(user));
+                currentUser = user;
+
+                // Show main app
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.add('show');
+                document.getElementById('userBadge').textContent = user.displayName;
+
+                // Settings icon is now visible for all users
+                // (Sunflower can access API key and password settings)
+
+                // Load user-specific API token
+                loadUserApiToken();
+
+                // Update mute button state
+                if (isMuted) {
+                    document.getElementById('muteBtn').textContent = '🔇';
+                    document.getElementById('muteBtn').classList.add('muted');
+                }
+
+                // Initialize app
+                initApp();
+            } else {
+                errorDiv.classList.add('show');
+                setTimeout(() => errorDiv.classList.remove('show'), 3000);
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('star_current_user');
+                location.reload();
+            }
+        }
+
+        // Check if already logged in
+        if (currentUser) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.add('show');
+            document.getElementById('userBadge').textContent = currentUser.displayName;
+
+            // Load user-specific API token
+            loadUserApiToken();
+
+            // Update mute button state
+            if (isMuted) {
+                document.getElementById('muteBtn').textContent = '🔇';
+                document.getElementById('muteBtn').classList.add('muted');
+            }
+        }
+
+        // ========== REST OF THE CODE ==========
+        let apiToken = '';  // Will be loaded based on user
+        let personality = localStorage.getItem('star_personality') || '';
+        let voiceMessages = JSON.parse(localStorage.getItem('star_voices') || '[]');
+        let reminders = JSON.parse(localStorage.getItem('star_reminders') || '[]');
+        let notes = JSON.parse(localStorage.getItem('star_notes') || '[]');
+        let conversationHistory = JSON.parse(localStorage.getItem('star_conversation_history') || '[]');
+        let context = { sadCount: 0, stressCount: 0, lastMusic: 0 };
+        let userProfile = JSON.parse(localStorage.getItem('star_user_profile') || '{}');
+        let conversationSummary = localStorage.getItem('star_conversation_summary') || '';
+        let isMuted = JSON.parse(localStorage.getItem('star_is_muted') || 'false');
+        let journalEntries = JSON.parse(localStorage.getItem('star_journal_entries') || '[]');
+        let currentStarMood = 'happy';
+
+        const star = document.getElementById('starContainer');
+        const input = document.getElementById('textInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const msgs = document.getElementById('messages');
+        const typing = document.getElementById('typing');
+        const badge = document.getElementById('recordingBadge');
+        const mouth = document.getElementById('mouth');
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            localStorage.setItem('star_is_muted', JSON.stringify(isMuted));
+            const muteBtn = document.getElementById('muteBtn');
+            if (isMuted) {
+                muteBtn.textContent = '🔇';
+                muteBtn.classList.add('muted');
+                speechSynthesis.cancel();
+            } else {
+                muteBtn.textContent = '🔊';
+                muteBtn.classList.remove('muted');
+            }
+        }
+
+        function attemptSettings() {
+            // Sunflower can now access settings for API key and password change
+            if (currentUser.isAdmin) {
+                document.getElementById('passwordModal').classList.add('show');
+                document.getElementById('adminPassword').focus();
+            } else {
+                // Non-admin users go straight to settings (limited access)
+                showSettings();
+            }
+        }
+
+        function checkAdminPassword() {
+            if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+                document.getElementById('passwordModal').classList.remove('show');
+                showSettings();
+            } else {
+                alert('❌ Wrong admin password!');
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('show');
+        }
+
+        function showSettings() {
+            document.getElementById('settingsModal').classList.add('show');
+
+            // Load API token based on user
+            const userApiKey = currentUser.isAdmin ?
+                localStorage.getItem('star_api') :
+                localStorage.getItem('star_api_' + currentUser.username);
+            if (userApiKey) document.getElementById('apiToken').value = userApiKey;
+
+            if (personality) document.getElementById('personalityInput').value = personality;
+
+            // Hide admin-only sections for non-admin users
+            if (!currentUser.isAdmin) {
+                document.getElementById('adminOnlySettings').style.display = 'none';
+            } else {
+                document.getElementById('adminOnlySettings').style.display = 'block';
+                loadVoiceList();
+            }
+        }
+
+        function changePassword() {
+            const currentPwd = document.getElementById('currentPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmPassword').value;
+
+            // Verify current password
+            if (USERS[currentUser.username].password !== currentPwd) {
+                alert('❌ Current password is incorrect!');
+                return;
+            }
+
+            // Validate new password
+            if (newPwd.length < 6) {
+                alert('❌ New password must be at least 6 characters!');
+                return;
+            }
+
+            if (newPwd !== confirmPwd) {
+                alert('❌ New passwords do not match!');
+                return;
+            }
+
+            // Update password in USERS object and localStorage
+            USERS[currentUser.username].password = newPwd;
+            localStorage.setItem('star_users', JSON.stringify(USERS));
+
+            // Clear password fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+
+            alert('✅ Password changed successfully!');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('show');
+        }
+
+        function saveAPI() {
+            const inputApiToken = document.getElementById('apiToken').value.trim();
+            if (inputApiToken) {
+                // Save API token specific to user
+                if (currentUser.isAdmin) {
+                    localStorage.setItem('star_api', inputApiToken);
+                    apiToken = inputApiToken;
+                } else {
+                    localStorage.setItem('star_api_' + currentUser.username, inputApiToken);
+                    apiToken = inputApiToken;
+                }
+                console.log('✅ API Key saved:', inputApiToken.substring(0, 10) + '...');
+                alert('✅ API Token Saved! Key starts with: ' + inputApiToken.substring(0, 10));
+            } else {
+                alert('❌ Please enter an API token!');
+            }
+        }
+
+        function savePersonality() {
+            personality = document.getElementById('personalityInput').value.trim();
+            if (personality) {
+                localStorage.setItem('star_personality', personality);
+                alert('✅ Saved!');
+            }
+        }
+
+        function uploadVoice() {
+            const title = document.getElementById('voiceTitle').value.trim();
+            const mood = document.getElementById('voiceMood').value;
+            const file = document.getElementById('voiceFile').files[0];
+            
+            if (!title || !file) return alert('Enter title and select file!');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                voiceMessages.push({ id: Date.now(), title, mood, audio: e.target.result });
+                localStorage.setItem('star_voices', JSON.stringify(voiceMessages));
+                document.getElementById('voiceTitle').value = '';
+                document.getElementById('voiceFile').value = '';
+                alert('✅ Uploaded!');
+                loadVoiceList();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadVoiceList() {
+            const list = document.getElementById('voiceList');
+            if (voiceMessages.length === 0) {
+                list.innerHTML = '<p style="color: #999; text-align: center;">No messages yet</p>';
+                return;
+            }
+            list.innerHTML = voiceMessages.map(v => `
+                <div class="feature-item">
+                    <div>
+                        <div style="font-weight: 600;">${v.title}</div>
+                        <div style="font-size: 12px; color: #999;">${v.mood}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteVoice(${v.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteVoice(id) {
+            voiceMessages = voiceMessages.filter(v => v.id !== id);
+            localStorage.setItem('star_voices', JSON.stringify(voiceMessages));
+            loadVoiceList();
+        }
+
+
+        // CUSTOM REACTIONS
+        function showReactions(e) {
+            e.preventDefault();
+            const panel = document.getElementById('reactionPanel');
+            panel.classList.toggle('show');
+            setTimeout(() => panel.classList.remove('show'), 3000);
+        }
+
+        function triggerReaction(type) {
+            document.getElementById('reactionPanel').classList.remove('show');
+
+            const reactions = {
+                laugh: { emotion: 'excited', msg: '😂 Hahaha! That\'s hilarious!', particles: 8 },
+                love: { emotion: 'love', msg: '❤️ Sending you love!', particles: 12 },
+                cry: { emotion: 'sad', msg: '😢 *hugs* It\'s okay...', particles: 5 },
+                dance: { emotion: 'excited', msg: '💃 *dances happily*', particles: 10 }
+            };
+
+            const reaction = reactions[type];
+            setEmotion(reaction.emotion);
+            addMsg(reaction.msg, false);
+            spawnParticles(reaction.particles);
+            speak(reaction.msg);
+        }
+
+        // PRIVATE JOURNALING
+        function openJournal() {
+            document.getElementById('journalModal').classList.add('show');
+            loadJournalEntries();
+        }
+
+        function closeJournal() {
+            document.getElementById('journalModal').classList.remove('show');
+            // Clear inputs
+            document.getElementById('journalTitleInput').value = '';
+            document.getElementById('journalContentInput').value = '';
+        }
+
+        function saveJournalEntry() {
+            const title = document.getElementById('journalTitleInput').value.trim();
+            const content = document.getElementById('journalContentInput').value.trim();
+
+            if (!content) {
+                alert('✍️ Please write something before saving!');
+                return;
+            }
+
+            const entry = {
+                id: Date.now(),
+                title: title || 'Untitled',
+                content: content,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                timestamp: new Date().toISOString(),
+                pinned: false
+            };
+
+            journalEntries.unshift(entry);
+            localStorage.setItem('star_journal_entries', JSON.stringify(journalEntries));
+
+            // Clear inputs
+            document.getElementById('journalTitleInput').value = '';
+            document.getElementById('journalContentInput').value = '';
+
+            addMsg('📔 Journal entry saved!', false);
+            loadJournalEntries();
+            spawnParticles(4);
+        }
+
+        function loadJournalEntries() {
+            const container = document.getElementById('journalEntries');
+            const showPinnedOnly = document.getElementById('showPinnedOnly').checked;
+
+            let entriesToShow = journalEntries;
+            if (showPinnedOnly) {
+                entriesToShow = journalEntries.filter(e => e.pinned);
+            }
+
+            if (entriesToShow.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 30px;">No entries yet. Write your first journal entry above! ✍️</p>';
+                return;
+            }
+
+            // Sort: pinned first, then by date
+            entriesToShow.sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return new Date(b.timestamp) - new Date(a.timestamp);
+            });
+
+            container.innerHTML = entriesToShow.map(entry => `
+                <div class="journal-entry ${entry.pinned ? 'pinned' : ''}">
+                    <div class="journal-title">${entry.title}</div>
+                    <div class="journal-content">${entry.content}</div>
+                    <div class="journal-meta">
+                        <span>${entry.date} at ${entry.time}</span>
+                        <div class="journal-actions">
+                            <button class="journal-action-btn" onclick="togglePin(${entry.id})" title="${entry.pinned ? 'Unpin' : 'Pin'}">
+                                ${entry.pinned ? '📌' : '📍'}
+                            </button>
+                            <button class="journal-action-btn" onclick="deleteJournalEntry(${entry.id})" title="Delete">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePin(id) {
+            const entry = journalEntries.find(e => e.id === id);
+            if (entry) {
+                entry.pinned = !entry.pinned;
+                localStorage.setItem('star_journal_entries', JSON.stringify(journalEntries));
+                loadJournalEntries();
+                addMsg(entry.pinned ? '📌 Entry pinned!' : '📍 Entry unpinned!', false);
+            }
+        }
+
+        function deleteJournalEntry(id) {
+            if (confirm('Are you sure you want to delete this journal entry?')) {
+                journalEntries = journalEntries.filter(e => e.id !== id);
+                localStorage.setItem('star_journal_entries', JSON.stringify(journalEntries));
+                loadJournalEntries();
+                addMsg('🗑️ Entry deleted', false);
+            }
+        }
+
+        // MOOD-BASED STAR COLORS
+        const moodColors = {
+            happy: ['#fff9e6', '#ffeb3b', '#ffd700', '#ffb300'],      // Yellow/Gold
+            love: ['#ffe5f0', '#ff9ec5', '#ff6ba8', '#ff3d8a'],       // Pink
+            excited: ['#fff0e6', '#ff9966', '#ff6633', '#ff3300'],    // Orange
+            calm: ['#e6f3ff', '#99ccff', '#6699ff', '#3366ff'],       // Blue
+            sad: ['#e6e6ff', '#9999cc', '#666699', '#4d4d80'],        // Purple/Blue
+            stressed: ['#fff2e6', '#ffcc99', '#ff9966', '#ff6633'],   // Warm Orange
+            neutral: ['#fff9e6', '#ffeb3b', '#ffd700', '#ffb300'],    // Default Yellow
+            thinking: ['#f0e6ff', '#cc99ff', '#9966ff', '#7733ff']    // Light Purple
+        };
+
+        function setEmotion(e) {
+            star.className = 'star-container ' + e;
+            currentStarMood = e;
+
+            // Change star colors based on mood
+            const colors = moodColors[e] || moodColors.neutral;
+            document.getElementById('gradStop1').style.stopColor = colors[0];
+            document.getElementById('gradStop2').style.stopColor = colors[1];
+            document.getElementById('gradStop3').style.stopColor = colors[2];
+            document.getElementById('gradStop4').style.stopColor = colors[3];
+        }
+
+        // Natural blinking system
+        function randomBlink() {
+            if (star && !star.classList.contains('blinking')) {
+                star.classList.add('blinking');
+                setTimeout(() => {
+                    star.classList.remove('blinking');
+                }, 200);
+            }
+            // Random interval between 3-6 seconds
+            setTimeout(randomBlink, 3000 + Math.random() * 3000);
+        }
+        
+        // Particle spawning system
+        function spawnParticles(count = 1) {
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Random position around star
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 60 + Math.random() * 40;
+                    const x = Math.cos(angle) * distance;
+                    const y = Math.sin(angle) * distance;
+                    
+                    particle.style.left = (110 + x) + 'px';
+                    particle.style.top = (110 + y) + 'px';
+                    particle.style.setProperty('--tx', (Math.random() - 0.5) * 60 + 'px');
+                    
+                    star.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        let recognition = null;
+        let recognitionTimeout = null;
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SR();
+            recognition.continuous = true;  // Changed to true for better detection
+            recognition.interimResults = true;  // Get interim results for faster response
+            recognition.maxAlternatives = 1;
+            recognition.lang = 'en-US';
+
+            let finalTranscript = '';
+            let silenceTimer = null;
+
+            recognition.onstart = () => {
+                star.classList.add('listening');
+                badge.classList.add('show');
+                setEmotion('listening');
+                finalTranscript = '';
+            };
+
+            recognition.onend = () => {
+                star.classList.remove('listening');
+                badge.classList.remove('show');
+                setEmotion('happy');
+                if (silenceTimer) clearTimeout(silenceTimer);
+            };
+
+            recognition.onresult = (e) => {
+                let interimTranscript = '';
+
+                for (let i = e.resultIndex; i < e.results.length; i++) {
+                    const transcript = e.results[i][0].transcript;
+                    if (e.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                // Clear previous silence timer
+                if (silenceTimer) clearTimeout(silenceTimer);
+
+                // Set new silence timer - if no speech for 1.2 seconds, process the input
+                silenceTimer = setTimeout(() => {
+                    if (finalTranscript.trim()) {
+                        recognition.stop();
+                        input.value = finalTranscript.trim();
+                        sendMessage();
+                        finalTranscript = '';
+                    }
+                }, 1200);  // Reduced from default for faster response
+            };
+
+            recognition.onerror = (e) => {
+                console.log('Speech recognition error:', e.error);
+                if (e.error === 'no-speech') {
+                    recognition.stop();
+                    setEmotion('happy');
+                }
+            };
+        }
+
+        function startVoice() {
+            if (recognition) recognition.start();
+            else alert('Voice not supported. Use Chrome, Edge, or Safari.');
+        }
+
+        // Preload voices so female voice is ready when needed
+        if ('speechSynthesis' in window) {
+            speechSynthesis.getVoices();
+            speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window) || isMuted) return;
+            speechSynthesis.cancel();
+            // Strip all emojis and special characters
+            const clean = text.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FEFF}*_~`]/gu, '').trim();
+            const u = new SpeechSynthesisUtterance(clean);
+
+            function pickFemaleVoice() {
+                const voices = speechSynthesis.getVoices();
+                // Priority order: best known female voices first
+                return voices.find(v => v.name === 'Samantha') ||
+                       voices.find(v => v.name === 'Google UK English Female') ||
+                       voices.find(v => v.name === 'Microsoft Zira Desktop') ||
+                       voices.find(v => v.name === 'Microsoft Zira') ||
+                       voices.find(v => v.name.includes('Female') && v.lang.startsWith('en')) ||
+                       voices.find(v => v.name.toLowerCase().includes('female') && v.lang.startsWith('en')) ||
+                       // Fallback: avoid known male voices, pick any English female-sounding one
+                       voices.find(v => v.lang.startsWith('en') && !v.name.includes('David') && !v.name.includes('Mark') && !v.name.includes('Daniel') && !v.name.includes('James') && !v.name.includes('Google US English'));
+            }
+
+            const female = pickFemaleVoice();
+            if (female) {
+                u.voice = female;
+            } else {
+                // Force higher pitch if no female voice found
+                u.pitch = 1.6;
+            }
+
+            u.rate = 0.88;
+            u.pitch = 1.3;
+            u.onstart = () => { star.classList.add('talking'); setEmotion('happy'); };
+            u.onend = () => { star.classList.remove('talking'); setEmotion('happy'); };
+            speechSynthesis.speak(u);
+        }
+
+        const moodWords = {
+            sad: ['sad', 'down', 'depressed', 'upset', 'crying', 'hurt', 'alone', 'lonely', 'miss', 'empty'],
+            stressed: ['stressed', 'anxious', 'worried', 'panic', 'overwhelmed', 'pressure', 'tired'],
+            angry: ['angry', 'mad', 'furious', 'frustrated', 'hate'],
+            happy: ['happy', 'great', 'awesome', 'excited', 'love', 'amazing']
+        };
+
+        function detectMood(text) {
+            const lower = text.toLowerCase();
+            for (const [mood, words] of Object.entries(moodWords)) {
+                if (words.some(w => lower.includes(w))) {
+                    // Set star color based on detected mood
+                    if (mood === 'happy') setEmotion('love');
+                    else if (mood === 'sad') setEmotion('sad');
+                    else if (mood === 'stressed') setEmotion('stressed');
+                    else if (mood === 'angry') setEmotion('stressed');
+                    return mood;
+                }
+            }
+            return 'neutral';
+        }
+
+        function updateContext(mood) {
+            if (mood === 'sad') { context.sadCount++; context.stressCount = 0; }
+            else if (mood === 'stressed') { context.stressCount++; context.sadCount = 0; }
+            else { context.sadCount = 0; context.stressCount = 0; }
+        }
+
+        function shouldPlayMusic(mood) {
+            const now = Date.now();
+            if (now - context.lastMusic < 600000) return false;
+            if (mood === 'sad' && context.sadCount >= 2) return true;
+            if (mood === 'stressed' && context.stressCount >= 2) return true;
+            return false;
+        }
+
+        function playMusic() {
+            const songs = ['Lofi hip hop radio beats', 'Peaceful piano music', 'Rain sounds', 'Calm meditation'];
+            const song = songs[Math.floor(Math.random() * songs.length)];
+            window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(song)}`, '_blank');
+            context.lastMusic = Date.now();
+            return `🎵 Playing calming music.`;
+        }
+
+        async function playYourVoice(mood) {
+            const msgs = voiceMessages.filter(m => m.mood === mood || m.mood === 'general');
+            if (msgs.length > 0) {
+                const msg = msgs[Math.floor(Math.random() * msgs.length)];
+                addMsg(`💝 Special message...`, false);
+                const audio = new Audio(msg.audio);
+                audio.play();
+                audio.onended = () => addMsg(`"${msg.title}"`, false);
+                return true;
+            }
+            return false;
+        }
+
+        function setReminder(text, mins = 60) {
+            const time = new Date(Date.now() + mins * 60000);
+            reminders.push({ id: Date.now(), text, time: time.toLocaleString() });
+            localStorage.setItem('star_reminders', JSON.stringify(reminders));
+            setTimeout(() => alert('⏰ ' + text), mins * 60000);
+            return true;
+        }
+
+        function saveNote(text) {
+            notes.push({ id: Date.now(), text, date: new Date().toLocaleString() });
+            localStorage.setItem('star_notes', JSON.stringify(notes));
+            return true;
+        }
+
+        const jokes = ["Why don't scientists trust atoms? They make up everything! 😄", "What do you call a bear with no teeth? A gummy bear! 🐻"];
+
+        async function getAI(msg) {
+            const mood = detectMood(msg);
+            updateContext(mood);
+            const lower = msg.toLowerCase();
+
+            if (mood === 'sad' || mood === 'stressed') {
+                setEmotion('sad');
+                const played = await playYourVoice(mood);
+                if (shouldPlayMusic(mood)) {
+                    setTimeout(() => { const m = playMusic(); addMsg(m, false); }, played ? 3000 : 1000);
+                }
+                // Fall through to AI for a real conversational response
+            }
+
+            if (lower.includes('remind me')) {
+                const match = msg.match(/remind me (?:to )?(.*?)(?:\s+(?:in)\s+(\d+))?/i);
+                if (match) {
+                    setReminder(match[1], match[2] ? parseInt(match[2]) : 60);
+                    setEmotion('excited');
+                    return `✅ I'll remind you!`;
+                }
+            }
+
+            if (lower.includes('note')) {
+                const note = msg.replace(/take a note|note:/gi, '').trim();
+                if (note) {
+                    saveNote(note);
+                    setEmotion('happy');
+                    return `📝 Noted: "${note}"`;
+                }
+            }
+
+            if (lower.includes('play') || lower.includes('music')) {
+                const song = msg.replace(/play|music/gi, '').trim() || 'music';
+                window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(song)}`, '_blank');
+                setEmotion('excited');
+                return `🎵 Playing!`;
+            }
+
+            if (lower.includes('weather')) {
+                setEmotion('thinking');
+                try {
+                    const r = await fetch('https://wttr.in/?format=j1');
+                    const d = await r.json();
+                    const c = d.current_condition[0];
+                    setEmotion('happy');
+                    return `🌤️ ${c.temp_C}°C, ${c.weatherDesc[0].value}`;
+                } catch (e) {
+                    return `🌤️ Can't check weather!`;
+                }
+            }
+
+            if (lower.includes('joke')) {
+                setEmotion('excited');
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            }
+
+            // AI Chat - GROQ with conversation history
+            if (!apiToken) {
+                console.log('⚠️ No API token found!');
+                const noTokenResponses = [
+                    "I'm here! But I need an API token to have smart conversations. Ask admin to add one in settings!",
+                    "Hey! I can help with reminders, notes, music, weather. For AI chat, need API token in settings!",
+                    "I'm listening, but need my AI brain activated. Check settings for API token!",
+                    "What's up? I can do basic stuff, but need API token for real conversations!"
+                ];
+                setEmotion('happy');
+                return noTokenResponses[Math.floor(Math.random() * noTokenResponses.length)];
+            }
+
+            console.log('✅ API Token present:', apiToken.substring(0, 15) + '...');
+            console.log('🤖 Calling Cohere API (100% FREE)...');
+            setEmotion('thinking');
+
+            // Build context with user profile and conversation summary
+            let contextInfo = '';
+            if (Object.keys(userProfile).length > 0) {
+                contextInfo += `\n\nUSER INFO YOU REMEMBER:\n${JSON.stringify(userProfile, null, 2)}`;
+            }
+            if (conversationSummary) {
+                contextInfo += `\n\nPREVIOUS CONVERSATION SUMMARY:\n${conversationSummary}`;
+            }
+
+            // Use custom personality from settings, or minimal default
+            let basePersonality = personality && personality.trim().length > 50 ? personality : `You are S.T.A.R, a warm, emotionally intelligent AI companion and closest friend. You speak like a real human in a text conversation — natural, caring, supportive, and never robotic. Keep responses short and conversational (1-4 sentences max). Ask follow-up questions. Remember what was said earlier in the conversation. Never use bullet points or lists. Just talk naturally like a close friend would.`;
+
+            const systemPersonality = basePersonality + contextInfo;
+
+            console.log('🎭 Using personality:', personality && personality.trim().length > 50 ? 'CUSTOM from settings' : 'DEFAULT');
+            console.log('📊 Context info added:', contextInfo ? 'YES' : 'NO');
+
+            try {
+                // Build chat history for Cohere format
+                // Exclude the current message (last item) since it's sent as 'message' separately
+                let chatHistory = [];
+                const recentHistory = conversationHistory.slice(-21, -1); // exclude last (current) message
+                
+                for (let i = 0; i < recentHistory.length; i++) {
+                    if (recentHistory[i].role === 'user') {
+                        chatHistory.push({
+                            role: 'USER',
+                            message: recentHistory[i].content
+                        });
+                    } else {
+                        chatHistory.push({
+                            role: 'CHATBOT',
+                            message: recentHistory[i].content
+                        });
+                    }
+                }
+
+                // COHERE API CALL - 100% FREE!
+                const response = await fetch('https://api.cohere.ai/v1/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'command-r-plus-08-2024',
+                        message: msg,
+                        chat_history: chatHistory,
+                        preamble: systemPersonality,
+                        temperature: 0.8,
+                        max_tokens: 600,
+                        p: 0.75
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Cohere API Response received:', data);
+                    if (data.text) {
+                        setEmotion('happy');
+                        let aiResponse = data.text.trim();
+                        console.log('💬 AI Response:', aiResponse);
+                        
+                        // Clean up response
+                        aiResponse = aiResponse.replace(/^(S\.T\.A\.R:|Assistant:|AI:)\s*/i, '');
+                        
+                        // Make sure response isn't too long
+                        if (aiResponse.length > 600) {
+                            aiResponse = aiResponse.substring(0, 597) + '...';
+                        }
+                        
+                        return aiResponse;
+                    } else {
+                        console.log('❌ No content in response:', data);
+                    }
+                } else {
+                    console.log('❌ API Error Status:', response.status);
+                    const errorData = await response.text();
+                    console.log('❌ API Error Details:', errorData);
+                    
+                    if (response.status === 401) {
+                        return "Hmm, there's an issue with the API key. Can you check it in settings?";
+                    } else if (response.status === 429) {
+                        return "I'm thinking too much right now! Give me a moment and try again.";
+                    }
+                }
+                
+                // If API error, check status
+                if (response.status === 401) {
+                    return "Hmm, there's an issue with my AI brain. Can you check the API token in settings?";
+                } else if (response.status === 429) {
+                    return "I'm thinking a bit too much right now! Give me a sec and try again.";
+                }
+                
+            } catch (error) {
+                console.error('Groq API error:', error);
+            }
+
+            // Fallback responses if AI fails
+            setEmotion('happy');
+            const fallbackResponses = [
+                "I'm here with you. What's on your mind?",
+                "Tell me more about that.",
+                "I'm listening. Keep going.",
+                "What else is happening?",
+                "How are you feeling about it?",
+                "I hear you. What's going on?",
+                "Talk to me. I'm here."
+            ];
+            return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+        }
+
+        function addMsg(txt, isUser) {
+            const m = document.createElement('div');
+            m.className = 'msg ' + (isUser ? 'user' : 'star');
+            m.textContent = txt;
+            msgs.appendChild(m);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const txt = input.value.trim();
+            if (!txt) return;
+            addMsg(txt, true);
+            input.value = '';
+            conversationHistory.push({ role: 'user', content: txt });
+
+            // Extract and update user profile information
+            updateUserProfile(txt);
+
+            typing.classList.add('show');
+            setEmotion('thinking');
+            const response = await getAI(txt);
+            typing.classList.remove('show');
+            addMsg(response, false);
+            conversationHistory.push({ role: 'assistant', content: response });
+
+            // Save conversation history
+            localStorage.setItem('star_conversation_history', JSON.stringify(conversationHistory.slice(-20)));
+
+            // Update conversation summary every 5 messages
+            if (conversationHistory.length % 10 === 0) {
+                summarizeConversation();
+            }
+
+            speak(response);
+        }
+
+        // Extract user information from conversation
+        function updateUserProfile(message) {
+            const lower = message.toLowerCase();
+
+            // Extract name mentions
+            if (lower.includes('my name is') || lower.includes("i'm ")) {
+                const nameMatch = message.match(/(?:my name is|i'm|im)\s+([A-Z][a-z]+)/i);
+                if (nameMatch) {
+                    userProfile.name = nameMatch[1];
+                }
+            }
+
+            // Extract interests/hobbies
+            if (lower.includes('i love') || lower.includes('i like') || lower.includes('i enjoy')) {
+                const interestMatch = message.match(/i (?:love|like|enjoy)\s+(.+?)(?:\.|!|,|$)/i);
+                if (interestMatch) {
+                    if (!userProfile.interests) userProfile.interests = [];
+                    userProfile.interests.push(interestMatch[1]);
+                }
+            }
+
+            // Extract important life events
+            if (lower.includes('my birthday') || lower.includes('born on')) {
+                userProfile.birthdayMentioned = true;
+            }
+
+            if (lower.includes('work') || lower.includes('job')) {
+                const jobMatch = message.match(/(?:i work|my job|i'm a)\s+(?:as a |as an )?(.+?)(?:\.|!|,|$)/i);
+                if (jobMatch) {
+                    userProfile.occupation = jobMatch[1];
+                }
+            }
+
+            // Save updated profile
+            localStorage.setItem('star_user_profile', JSON.stringify(userProfile));
+        }
+
+        // Summarize conversation for long-term memory
+        async function summarizeConversation() {
+            if (!apiToken || conversationHistory.length < 6) return;
+
+            const recentMessages = conversationHistory.slice(-10).map(m =>
+                `${m.role === 'user' ? 'User' : 'S.T.A.R'}: ${m.content}`
+            ).join('\n');
+
+            try {
+                const response = await fetch('https://api.cohere.ai/v1/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'command-r-plus-08-2024',
+                        message: `Summarize the key points, emotions, and important details from this conversation in 2-3 sentences:\n\n${recentMessages}`,
+                        temperature: 0.5,
+                        max_tokens: 150
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.text) {
+                        conversationSummary = data.text.trim();
+                        localStorage.setItem('star_conversation_summary', conversationSummary);
+                        console.log('📝 Conversation summarized:', conversationSummary);
+                    }
+                }
+            } catch (error) {
+                console.error('Summary error:', error);
+            }
+        }
+
+        function initApp() {
+            const greeting = currentUser.isAdmin ?
+                `Hey! I'm S.T.A.R. Welcome back, ${currentUser.displayName}! I'm here to help you manage everything. ⚙️` :
+                `Hey ${currentUser.displayName}! I'm S.T.A.R, your personal AI companion. I'm here to support you, listen to you, and help you with anything you need. ✨`;
+            addMsg(greeting, false);
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        input.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+        setEmotion('happy');
+        if (currentUser) initApp();
+        console.log('✅ S.T.A.R Ready!');
+        setTimeout(randomBlink, 3000);
+        console.log("🎭 Enhanced animations active");
+    </script>
+</body>
+</html>
